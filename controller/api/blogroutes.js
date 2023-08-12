@@ -1,40 +1,129 @@
 const router = require('express').Router();
-const { BlogPost } = require('../../models');
+const withAuth = require('../../public/js/auth'); // Require your authentication middleware
+const { Blog, User, Comment } = require('../../models'); // Adjust the paths as needed
 
+
+// Route to get all blog posts
 router.get('/', async (req, res) => {
     try {
-        const blogs = await Blog.findAll();
-        res.status(200).json(blogs);
+      const blogs = await Blog.findAll({
+        include: [
+          {
+            model: User,
+            attributes: ['name']
+          },
+          {
+            model: Comment,
+            attributes: ['content', 'user_id', 'createdAt'],
+            include: {
+              model: User,
+              attributes: ['name']
+            }
+          }
+        ],
+        order: [['createdAt', 'DESC']]
+      });
+  
+      res.status(200).json(blogs);
     } catch (err) {
-        res.status(500).json(err);
+      res.status(500).json(err);
     }
-});
-
-router.get('/:id', async (req, res) => {
+  });
+  
+  // Route to get a single blog post
+  router.get('/:id', async (req, res) => {
+    try {
+      const blog = await Blog.findByPk(req.params.id, {
+        include: [
+          {
+            model: User,
+            attributes: ['name']
+          },
+          {
+            model: Comment,
+            attributes: ['content', 'user_id', 'createdAt'],
+            include: {
+              model: User,
+              attributes: ['name']
+            }
+          }
+        ]
+      });
+  
+      if (!blog) {
+        res.status(404).json({ message: 'No blog post found' });
+        return;
+      }
+  
+      res.status(200).json(blog);
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  });
+  
+// Route to create a blog
+router.post('/', withAuth, async (req, res) => {
   try {
-    const blog = await Blog.findByPk(req.params.id);
-    
-    if (!blog) {
-      res.status(404).json({ message: 'No blog post found with this id' });
-      return;
-    }
+    const newBlog = await Blog.create({
+      title: req.body.title,
+      content: req.body.content,
+      user_id: req.session.user_id 
+    });
 
-    res.status(200).json(blog);
+    res.status(201).json(newBlog);
   } catch (err) {
     res.status(500).json(err);
   }
 });
 
-router.post('/', async (req, res) => {
-    // Create a new blog post
+// Route for updating a blog post
+router.put('/:id', withAuth, async (req, res) => {
+  try {
+    const updatedBlog = await Blog.update(
+      {
+        title: req.body.title,
+        content: req.body.content
+      },
+      {
+        where: {
+          id: req.params.id,
+          user_id: req.session.user_id
+        }
+      }
+    );
+
+    if (!updatedBlog[0]) {
+      res.status(404).json({ message: 'No blog post found' });
+      return;
+    }
+
+    res.status(200).json({ message: 'Blog post updated successfully' });
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
-router.put('/:id', async (req, res) => {
-    // Update an existing blog post
+// Route for deleting a blog post
+router.delete('/:id', withAuth, async (req, res) => {
+  try {
+    const deletedBlog = await Blog.destroy({
+      where: {
+        id: req.params.id,
+        user_id: req.session.user_id
+      }
+    });
+
+    if (!deletedBlog) {
+      res.status(404).json({ message: 'No blog post found' });
+      return;
+    }
+
+    res.status(200).json({ message: 'Blog post deleted successfully' });
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
-router.delete('/:id', async (req, res) => {
-    // Delete a blog post
-});
+
 
 module.exports = router;
