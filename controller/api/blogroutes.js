@@ -1,6 +1,6 @@
 const router = require('express').Router();
-const withAuth = require('../../public/js/auth'); // Require your authentication middleware
-const { Blog, User, Comment } = require('../../models'); // Adjust the paths as needed
+const withAuth = require('../../public/js/auth'); 
+const { Blog, User, Comment } = require('../../models');
 
 
 // Route to get all blog posts

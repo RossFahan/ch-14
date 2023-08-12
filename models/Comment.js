@@ -22,6 +22,11 @@ Comment.init(
         key: 'id',
       },
     },
+    date: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+      allowNull: false,
+    },
     blog_id: {
       type: DataTypes.INTEGER,
       references: {
@@ -32,6 +37,8 @@ Comment.init(
   },
   {
     sequelize,
+    freezeTableName: true,
+    underscored: true,
     modelName: 'comment',
   }
 );

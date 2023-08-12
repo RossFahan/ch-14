@@ -5,7 +5,7 @@ const blogRoutes = require('./blogRoutes');
 const commentRoutes = require('./commentRoutes');
 
 // Use the imported sub-route handlers
-router.use('/users', userRoutes);
+router.use('/user', userRoutes);
 router.use('/blogs', blogRoutes);
 router.use('/comments', commentRoutes);
 
