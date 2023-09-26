@@ -5,20 +5,35 @@ const bcrypt = require('bcrypt');
 // Route for signing up a new user
 router.post('/signup', async (req, res) => {
   try {
-    const newUser = await User.create({
-      name: req.body.name,
-      email: req.body.email,
-      password: await bcrypt.hash(req.body.password, 10)
-    });
+      const { username, email, password } = req.body;
 
-    req.session.save(() => {
-      req.session.user_id = newUser.id;
-      req.session.logged_in = true;
+      // Create the user
+      await User.create({
+          username,
+          email,
+          password
+      });
 
-      res.status(201).json(newUser);
-    });
+      // Fetch user data from the database
+      const userData = await User.findOne({ where: { username } });
+
+      if (!userData) {
+          console.log('User data not found');
+          return res.status(400).json({ message: 'User data not found' });
+      }
+
+      // Save the session and redirect
+      req.session.save(() => {
+          req.session.user_id = userData.id;
+          req.session.logged_in = true;
+
+
+          res.json({ user: userData, message: 'You are now logged in!' });
+      });
+
   } catch (err) {
-    res.status(500).json(err);
+      console.error(err);
+      res.status(500).json(err);
   }
 });
 

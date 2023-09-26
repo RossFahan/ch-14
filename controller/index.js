@@ -9,10 +9,11 @@
 // create post -- requires auth
 
 const apiRoutes = require('./api');
-
+const homeRoutes = require('./home-routes');
 const router = require('express').Router();
 
-// Use the imported route handlers
+router.use('/', homeRoutes);
 router.use('/api', apiRoutes);
+
 
 module.exports = router;
