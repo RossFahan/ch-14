@@ -1,4 +1,22 @@
-<!-- new-blog-post.handlebars -->
+{{#each user.blogs}}
+  <div class="blog-post">
+    <h2 id="blog-{{this.id}}" style="color: blue;">{{this.title}}</h2> <!-- Blue title -->
+    <p>{{this.content}}</p>
+    <p>Posted by: {{this.username}}</p>
+    <p>Posted on: {{this.createdAt}}</p>
+    <!-- Comment display logic below -->
+    <div class="comments-section">
+      {{#each this.comments}}
+        <div class="comment">
+          <p>{{this.comment_text}} - {{this.user.username}}</p>
+        </div>
+      {{/each}}
+    </div>
+
+    <button onclick="location.href='/dashboard/edit/{{this.id}}'">Update</button>
+    <button onclick="deletePost({{this.id}})">Delete</button>
+  </div>
+{{/each}}
 
 <h1>Add New Blog Post</h1>
 <form id="new-blog-form">
@@ -13,4 +31,4 @@
   <button type="submit">Create Blog Post</button>
 </form>
 
-<script src="/js/new-blog-post.js"></script>
+<script src="/js/dashboard.js"></script>

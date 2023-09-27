@@ -1,8 +1,23 @@
 {{#if blogs.length}}
   {{#each blogs}}
   <article>
-    <h2>{{this.title}}</h2>
-    <p>Posted by: {{this.User.username}}</p>
+    {{#if logged_in}}
+      <h2 id="blog-{{this.id}}" class="blog-title logged-in">{{this.title}}</h2>
+      <!--  comment form  -->
+      <div id="comment-form-{{this.id}}" style="display: none;">
+        <form id="new-comment-form-{{this.id}}">
+          <div>
+            <label for="comment">Comment</label>
+            <textarea id="comment-{{this.id}}" name="comment" required></textarea>
+          </div>
+          <button type="submit">Submit Comment</button>
+        </form>
+      </div>
+    {{else}}
+      <h2 class="blog-title not-logged-in">{{this.title}}</h2>
+    {{/if}}
+    <p>Posted by: {{this.user.username}}</p>
+    <p>Posted on: {{this.createdAt}}</p>
     <p>{{this.content}}</p>
   </article>
   {{/each}}
