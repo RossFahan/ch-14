@@ -60,6 +60,41 @@ function renderCommentBox(blogId) {
   });
 }
 
+// Function to delete a blog post
+async function deletePost(blogId) {
+  const response = await fetch(`/api/blogs/${blogId}`, {
+    method: 'DELETE',
+  });
+
+  if (response.ok) {
+    document.location.reload();
+  } else {
+    alert('Failed to delete post');
+  }
+}
+
+// Function to update a blog post
+async function updateBlog(event) {
+  event.preventDefault();
+  const blogId = event.target.getAttribute('data-id');
+  const title = document.querySelector(`#title-${blogId}`).value.trim();
+  const content = document.querySelector(`#content-${blogId}`).value.trim();
+  
+  if (title && content) {
+    const response = await fetch(`/api/blogs/${blogId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ title, content }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (response.ok) {
+      document.location.reload();
+    } else {
+      alert('Failed to update post');
+    }
+  }
+}
+
+
 // Event Listener for blog title click
 document.querySelectorAll('.blog-post h2').forEach((element) => {
   element.addEventListener('click', function() {
@@ -70,3 +105,50 @@ document.querySelectorAll('.blog-post h2').forEach((element) => {
 
 // Event Listener for new blog form submission
 document.querySelector('#new-blog-form').addEventListener('submit', newBlog);
+
+// Event Listener for update blog form submissions
+document.querySelectorAll('.update-button').forEach((button) => {
+  button.addEventListener('click', function(event) {
+    event.preventDefault();
+    const blogId = this.getAttribute('data-id');
+    const title = document.querySelector(`#title-${blogId}`).value.trim();
+    const content = document.querySelector(`#content-${blogId}`).value.trim();
+
+    if (title && content) {
+      // Perform an AJAX request to update the blog post
+      fetch(`/api/blogs/${blogId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ title, content }),
+        headers: { 'Content-Type': 'application/json' },
+      })
+        .then((response) => {
+          if (response.ok) {
+            return response.json(); // Parse JSON response if successful
+          } else {
+            throw new Error('Failed to update the blog post');
+          }
+        })
+        .then((data) => {
+          // Check the response data or perform any necessary action upon successful update
+          if (data.success) {
+            // Reload the page or perform other actions as needed
+            document.location.reload();
+          } else {
+            alert('Failed to update the blog post');
+          }
+        })
+        .catch((error) => {
+          console.error('Error updating blog post', error);
+          alert('Failed to update the blog post');
+        });
+    }
+  });
+});
+
+// Event Listener for delete buttons
+document.querySelectorAll('.delete-button').forEach((button) => {
+  button.addEventListener('click', function() {
+    const blogId = this.getAttribute('data-id');
+    deletePost(blogId);
+  });
+});
