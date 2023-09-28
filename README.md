@@ -18,7 +18,7 @@ Tech Blog is a CMS-style blog platform where developers can publish blog posts a
 
 ## Deployed Site
 
-[Deployed Site](#Deployed_Link_Here)
+[Deployed Site](https://tech-blod-210a284c9244.herokuapp.com/)
 
 
 ## How to Use
